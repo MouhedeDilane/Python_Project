@@ -1604,6 +1604,8 @@ class RealTimePlot3(QMainWindow):
         self.ax.set_title('Real-Time Plot')
         self.ax.legend(loc='upper left')
 
+
+
 if __name__ == "__main__":
     
     import sys
