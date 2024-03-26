@@ -7,6 +7,8 @@ Creator : Mehdi Delouane
 import sys
 import random
 from socket import *
+import csv
+import numpy as np
 
 from PyQt5.QtWidgets import * 
 from PyQt5 import QtCore, QtGui 
@@ -924,6 +926,10 @@ class Ui_MainWindow(object):
 
     # Call the MultiRealTimePlot class
     def launch_plot(self):
+        address = ('192.168.0.101', 5000)
+        self.client_socket = socket(AF_INET, SOCK_DGRAM)  # Set up the socket
+        self.client_socket.settimeout(1)
+        self.client_socket.sendto(b"TEST", address)
         self.second_window = MultiRealTimePlot()
         self.second_window.show()
 
@@ -1039,9 +1045,34 @@ class RealTimePlot1(QMainWindow):
             x_length = 10
 
         checked_boxes = [self.checkbox_1, self.checkbox_2, self.checkbox_3, self.checkbox_4,self.checkbox_5,self.checkbox_6, self.checkbox_7,self.checkbox_8,self.checkbox_9]
+        """
+        address= ( '192.168.0.101', 5000) #define server IP and port
+        client_socket =socket(AF_INET, SOCK_DGRAM) #Set up the Socket
+        client_socket.settimeout(1)
+        data, addr = client_socket.recvfrom(2048)
+        a = []
+        for i in range(4, len(data), 2):
+            a1 = (int(data[i]) << 8 | int(data[i+1]))
+            a.append(a1)
+
+        with open('data.csv', 'a') as file:
+            writer = csv.writer(file)
+            writer.writerow(a)
+        self.y_data.append(float(a[-1]))
+        self.csv_writer.writerow()
+
         
-        self.x_data.append(len(self.x_data))
-        self.y_data.append([random.random() for _ in range(len(checked_boxes))])  # Generate 4 random values for each curve
+        with open('data.csv', 'r') as csvfile:
+            reader = csv.reader(csvfile)
+            next(reader)  # Skip the header row
+            for row in reader:
+                print(row)
+                self.y_data.append([float(row[i]) for i in range(2)])  # Generate 4 random values for each curve
+        """
+        self.x_data.append(0.1*len(self.x_data))
+        self.y_data.append([np.sin(freq*self.x_data[-1]) for freq in range(1,11)])
+        
+        
         self.ax.clear()
         rows = 4
         cols = 1
@@ -1074,7 +1105,8 @@ class RealTimePlot1(QMainWindow):
         else:
             self.ax.set_xlim(max(self.x_data) - x_length, max(self.x_data))
         self.ax.set_xlabel('Time')
-        self.ax.set_ylabel('Value')
+        self.ax.set_ylabel('Pressure (Pa)')
+        self.ax.grid()
         self.ax.set_title('Real-Time Plot')
         self.ax.legend(loc='upper left')
 
@@ -1186,6 +1218,7 @@ class RealTimePlot2(QMainWindow):
             self.ax.set_xlim(max(self.x_data) - x_length, max(self.x_data))
         self.ax.set_xlabel('Time')
         self.ax.set_ylabel('Value')
+        self.ax.grid()
         self.ax.set_title('Real-Time Plot')
         self.ax.legend(loc='upper left')
 
@@ -1302,6 +1335,7 @@ class RealTimePlot3(QMainWindow):
             self.ax.set_xlim(max(self.x_data) - x_length, max(self.x_data))
         self.ax.set_xlabel('Time')
         self.ax.set_ylabel('Value')
+        self.ax.grid()
         self.ax.set_title('Real-Time Plot')
         self.ax.legend(loc='upper left')
 
