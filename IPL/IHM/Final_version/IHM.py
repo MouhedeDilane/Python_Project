@@ -973,46 +973,59 @@ class RealTimePlot1(QMainWindow):
         self.controls_frame = QFrame(self)
         self.controls_frame.setFrameShape(QFrame.StyledPanel)
         layout.addWidget(self.controls_frame)
-
+        self.controls_frame.setFixedWidth(200)
         # Layout for x-axis interval and curves controls
-        controls_layout = QVBoxLayout(self.controls_frame)
+        self.controls_layout = QGridLayout(self.controls_frame)
 
-        self.x_length_label = QLabel("X-Axis Interval:", self)
-        controls_layout.addWidget(self.x_length_label)
+        self.x_length_label = QLabel("Time Interval:", self)
+        self.controls_layout.addWidget(self.x_length_label)
 
-        self.button_10 = QPushButton("10", self)
-        self.button_10.clicked.connect(lambda: self.set_x_interval(10))
-        controls_layout.addWidget(self.button_10)
+        self.button_1m = QPushButton("1m", self)
+        self.button_1m.clicked.connect(lambda: self.set_x_interval(1*60))
+        self.controls_layout.addWidget(self.button_1m)
 
-        self.button_50 = QPushButton("50", self)
-        self.button_50.clicked.connect(lambda: self.set_x_interval(50))
-        controls_layout.addWidget(self.button_50)
+        self.button_10m = QPushButton("10m", self)
+        self.button_10m.clicked.connect(lambda: self.set_x_interval(10*60))
+        self.controls_layout.addWidget(self.button_10m)
 
-        self.button_100 = QPushButton("100", self)
-        self.button_100.clicked.connect(lambda: self.set_x_interval(100))
-        controls_layout.addWidget(self.button_100)
+        self.button_30m = QPushButton("30m", self)
+        self.button_30m.clicked.connect(lambda: self.set_x_interval(30*60))
+        self.controls_layout.addWidget(self.button_30m)
 
-        self.curve_label = QLabel("Number of Curves:", self)
-        controls_layout.addWidget(self.curve_label)
+        self.button_All = QPushButton("All", self)
+        self.button_All.clicked.connect(lambda: self.set_x_interval(-1))
+        self.controls_layout.addWidget(self.button_All)
+
+        self.curve_label = QLabel("Sensors:", self)
+        self.controls_layout.addWidget(self.curve_label)
 
         self.checkbox_1 = QCheckBox("Curve 1", self)
         self.checkbox_1.setChecked(True)  # Default to show the first curve
-        controls_layout.addWidget(self.checkbox_1)
+        self.controls_layout.addWidget(self.checkbox_1)
 
         self.checkbox_2 = QCheckBox("Curve 2", self)
-        controls_layout.addWidget(self.checkbox_2)
+        self.controls_layout.addWidget(self.checkbox_2)
 
         self.checkbox_3 = QCheckBox("Curve 3", self)
-        controls_layout.addWidget(self.checkbox_3)
+        self.controls_layout.addWidget(self.checkbox_3)
 
         self.checkbox_4 = QCheckBox("Curve 4", self)
-        controls_layout.addWidget(self.checkbox_4)
+        self.controls_layout.addWidget(self.checkbox_4)
 
         self.checkbox_5 = QCheckBox("Curve 5", self)
-        controls_layout.addWidget(self.checkbox_5)
+        self.controls_layout.addWidget(self.checkbox_5)
 
         self.checkbox_6 = QCheckBox("Curve 6", self)
-        controls_layout.addWidget(self.checkbox_6)
+        self.controls_layout.addWidget(self.checkbox_6)
+
+        self.checkbox_7 = QCheckBox("Curve 4", self)
+        self.controls_layout.addWidget(self.checkbox_7)
+
+        self.checkbox_8 = QCheckBox("Curve 8", self)
+        self.controls_layout.addWidget(self.checkbox_8)
+
+        self.checkbox_9 = QCheckBox("Curve 9", self)
+        self.controls_layout.addWidget(self.checkbox_9)
 
         self.animation = FuncAnimation(self.fig, self.update_plot, interval=1000)
 
@@ -1025,12 +1038,25 @@ class RealTimePlot1(QMainWindow):
         except AttributeError:
             x_length = 10
 
-        checked_boxes = [self.checkbox_1, self.checkbox_2, self.checkbox_3, self.checkbox_4,self.checkbox_5,self.checkbox_6]
+        checked_boxes = [self.checkbox_1, self.checkbox_2, self.checkbox_3, self.checkbox_4,self.checkbox_5,self.checkbox_6, self.checkbox_7,self.checkbox_8,self.checkbox_9]
         
         self.x_data.append(len(self.x_data))
         self.y_data.append([random.random() for _ in range(len(checked_boxes))])  # Generate 4 random values for each curve
         self.ax.clear()
+        rows = 4
+        cols = 1
+        for i, checkbox in enumerate(checked_boxes):
+            row = rows + i % 5
+            col = cols * (i // 5)
+            self.controls_layout.addWidget(checkbox, row, col)
 
+        self.controls_layout.addWidget(self.x_length_label, 0, 0)
+        self.controls_layout.addWidget(self.curve_label, 3, 0)
+        self.controls_layout.addWidget(self.button_1m, 1, 0)
+        self.controls_layout.addWidget(self.button_10m, 1, 1)
+        self.controls_layout.addWidget(self.button_30m, 2, 0)
+        self.controls_layout.addWidget(self.button_All, 2, 1)
+        #self.controls_layout.addWidget(checkbox, row, col)
         num_checked_boxes = sum(1 for checkbox in checked_boxes if checkbox.isChecked())
 
         for i, checkbox in enumerate(checked_boxes):
@@ -1041,7 +1067,9 @@ class RealTimePlot1(QMainWindow):
                 checkbox.setEnabled(True)
                 self.ax.plot(self.x_data, [data[i] for data in self.y_data], label=f'Curve {i+1}')
 
-        if max(self.x_data) - x_length < 0:
+        if x_length == -1:
+            self.ax.set_xlim(min(self.x_data), max(self.x_data))
+        elif max(self.x_data) - x_length < 0:
             self.ax.set_xlim(0, x_length)
         else:
             self.ax.set_xlim(max(self.x_data) - x_length, max(self.x_data))
@@ -1074,46 +1102,48 @@ class RealTimePlot2(QMainWindow):
         self.controls_frame = QFrame(self)
         self.controls_frame.setFrameShape(QFrame.StyledPanel)
         layout.addWidget(self.controls_frame)
+        self.controls_frame.setFixedWidth(200)
 
         # Layout for x-axis interval and curves controls
-        controls_layout = QVBoxLayout(self.controls_frame)
+        self.controls_layout = QGridLayout(self.controls_frame)
 
-        self.x_length_label = QLabel("X-Axis Interval:", self)
-        controls_layout.addWidget(self.x_length_label)
+        self.x_length_label = QLabel("Time Interval:", self)
+        self.controls_layout.addWidget(self.x_length_label)
 
-        self.button_10 = QPushButton("10", self)
-        self.button_10.clicked.connect(lambda: self.set_x_interval(10))
-        controls_layout.addWidget(self.button_10)
+        self.button_1m = QPushButton("1m", self)
+        self.button_1m.clicked.connect(lambda: self.set_x_interval(1*60))
+        self.controls_layout.addWidget(self.button_1m)
 
-        self.button_50 = QPushButton("50", self)
-        self.button_50.clicked.connect(lambda: self.set_x_interval(50))
-        controls_layout.addWidget(self.button_50)
+        self.button_10m = QPushButton("10m", self)
+        self.button_10m.clicked.connect(lambda: self.set_x_interval(10*60))
+        self.controls_layout.addWidget(self.button_10m)
 
-        self.button_100 = QPushButton("100", self)
-        self.button_100.clicked.connect(lambda: self.set_x_interval(100))
-        controls_layout.addWidget(self.button_100)
+        self.button_30m = QPushButton("30m", self)
+        self.button_30m.clicked.connect(lambda: self.set_x_interval(30*60))
+        self.controls_layout.addWidget(self.button_30m)
 
-        self.curve_label = QLabel("Number of Curves:", self)
-        controls_layout.addWidget(self.curve_label)
+        self.button_All = QPushButton("All", self)
+        self.button_All.clicked.connect(lambda: self.set_x_interval(-1))
+        self.controls_layout.addWidget(self.button_All)
+
+        self.curve_label = QLabel("Sensors:", self)
+        self.controls_layout.addWidget(self.curve_label)
 
         self.checkbox_1 = QCheckBox("Curve 1", self)
         self.checkbox_1.setChecked(True)  # Default to show the first curve
-        controls_layout.addWidget(self.checkbox_1)
+        self.controls_layout.addWidget(self.checkbox_1)
 
         self.checkbox_2 = QCheckBox("Curve 2", self)
-        controls_layout.addWidget(self.checkbox_2)
+        self.controls_layout.addWidget(self.checkbox_2)
 
         self.checkbox_3 = QCheckBox("Curve 3", self)
-        controls_layout.addWidget(self.checkbox_3)
+        self.controls_layout.addWidget(self.checkbox_3)
 
         self.checkbox_4 = QCheckBox("Curve 4", self)
-        controls_layout.addWidget(self.checkbox_4)
+        self.controls_layout.addWidget(self.checkbox_4)
 
         self.checkbox_5 = QCheckBox("Curve 5", self)
-        controls_layout.addWidget(self.checkbox_5)
-
-        self.checkbox_6 = QCheckBox("Curve 6", self)
-        controls_layout.addWidget(self.checkbox_6)
+        self.controls_layout.addWidget(self.checkbox_5)
 
         self.animation = FuncAnimation(self.fig, self.update_plot, interval=1000)
 
@@ -1126,12 +1156,18 @@ class RealTimePlot2(QMainWindow):
         except AttributeError:
             x_length = 10
 
-        checked_boxes = [self.checkbox_1, self.checkbox_2, self.checkbox_3, self.checkbox_4,self.checkbox_5,self.checkbox_6]
+        checked_boxes = [self.checkbox_1, self.checkbox_2, self.checkbox_3, self.checkbox_4,self.checkbox_5]
         
         self.x_data.append(len(self.x_data))
-        self.y_data.append([random.random() for _ in range(len(checked_boxes))])  # Generate 4 random values for each curve
+        self.y_data.append([random.random() for _ in range(len(checked_boxes))])  
         self.ax.clear()
 
+        self.controls_layout.addWidget(self.x_length_label, 0, 0)
+        self.controls_layout.addWidget(self.curve_label, 3, 0)
+        self.controls_layout.addWidget(self.button_1m, 1, 0)
+        self.controls_layout.addWidget(self.button_10m, 1, 1)
+        self.controls_layout.addWidget(self.button_30m, 2, 0)
+        self.controls_layout.addWidget(self.button_All, 2, 1)
         num_checked_boxes = sum(1 for checkbox in checked_boxes if checkbox.isChecked())
 
         for i, checkbox in enumerate(checked_boxes):
@@ -1142,7 +1178,9 @@ class RealTimePlot2(QMainWindow):
                 checkbox.setEnabled(True)
                 self.ax.plot(self.x_data, [data[i] for data in self.y_data], label=f'Curve {i+1}')
 
-        if max(self.x_data) - x_length < 0:
+        if x_length == -1:
+            self.ax.set_xlim(min(self.x_data), max(self.x_data))
+        elif max(self.x_data) - x_length < 0:
             self.ax.set_xlim(0, x_length)
         else:
             self.ax.set_xlim(max(self.x_data) - x_length, max(self.x_data))
@@ -1175,46 +1213,48 @@ class RealTimePlot3(QMainWindow):
         self.controls_frame = QFrame(self)
         self.controls_frame.setFrameShape(QFrame.StyledPanel)
         layout.addWidget(self.controls_frame)
+        self.controls_frame.setFixedWidth(200)
 
         # Layout for x-axis interval and curves controls
-        controls_layout = QVBoxLayout(self.controls_frame)
+        self.controls_layout = QGridLayout(self.controls_frame)
 
-        self.x_length_label = QLabel("X-Axis Interval:", self)
-        controls_layout.addWidget(self.x_length_label)
+        self.x_length_label = QLabel("Time Interval:", self)
+        self.controls_layout.addWidget(self.x_length_label)
 
-        self.button_10 = QPushButton("10", self)
-        self.button_10.clicked.connect(lambda: self.set_x_interval(10))
-        controls_layout.addWidget(self.button_10)
+        self.button_1m = QPushButton("1m", self)
+        self.button_1m.clicked.connect(lambda: self.set_x_interval(1*60))
+        self.controls_layout.addWidget(self.button_1m)
 
-        self.button_50 = QPushButton("50", self)
-        self.button_50.clicked.connect(lambda: self.set_x_interval(50))
-        controls_layout.addWidget(self.button_50)
+        self.button_10m = QPushButton("10m", self)
+        self.button_10m.clicked.connect(lambda: self.set_x_interval(10*60))
+        self.controls_layout.addWidget(self.button_10m)
 
-        self.button_100 = QPushButton("100", self)
-        self.button_100.clicked.connect(lambda: self.set_x_interval(100))
-        controls_layout.addWidget(self.button_100)
+        self.button_30m = QPushButton("30m", self)
+        self.button_30m.clicked.connect(lambda: self.set_x_interval(30*60))
+        self.controls_layout.addWidget(self.button_30m)
 
-        self.curve_label = QLabel("Number of Curves:", self)
-        controls_layout.addWidget(self.curve_label)
+        self.button_All = QPushButton("All", self)
+        self.button_All.clicked.connect(lambda: self.set_x_interval(-1))
+        self.controls_layout.addWidget(self.button_All)
+
+        self.curve_label = QLabel("Sensors:", self)
+        self.controls_layout.addWidget(self.curve_label)
+        
+        self.curve_label1 = QLabel(" ", self)
+        self.controls_layout.addWidget(self.curve_label1)
+        self.curve_label2 = QLabel(" ", self)
+        self.controls_layout.addWidget(self.curve_label2)
+        self.curve_label3 = QLabel(" ", self)
+        self.controls_layout.addWidget(self.curve_label3)
+        self.curve_label4 = QLabel(" ", self)
+        self.controls_layout.addWidget(self.curve_label4)
+        self.curve_label5 = QLabel(" ", self)
+        self.controls_layout.addWidget(self.curve_label5)
 
         self.checkbox_1 = QCheckBox("Curve 1", self)
         self.checkbox_1.setChecked(True)  # Default to show the first curve
-        controls_layout.addWidget(self.checkbox_1)
+        self.controls_layout.addWidget(self.checkbox_1)
 
-        self.checkbox_2 = QCheckBox("Curve 2", self)
-        controls_layout.addWidget(self.checkbox_2)
-
-        self.checkbox_3 = QCheckBox("Curve 3", self)
-        controls_layout.addWidget(self.checkbox_3)
-
-        self.checkbox_4 = QCheckBox("Curve 4", self)
-        controls_layout.addWidget(self.checkbox_4)
-
-        self.checkbox_5 = QCheckBox("Curve 5", self)
-        controls_layout.addWidget(self.checkbox_5)
-
-        self.checkbox_6 = QCheckBox("Curve 6", self)
-        controls_layout.addWidget(self.checkbox_6)
 
         self.animation = FuncAnimation(self.fig, self.update_plot, interval=1000)
 
@@ -1227,12 +1267,23 @@ class RealTimePlot3(QMainWindow):
         except AttributeError:
             x_length = 10
 
-        checked_boxes = [self.checkbox_1, self.checkbox_2, self.checkbox_3, self.checkbox_4,self.checkbox_5,self.checkbox_6]
+        checked_boxes = [self.checkbox_1]
         
         self.x_data.append(len(self.x_data))
         self.y_data.append([random.random() for _ in range(len(checked_boxes))])  # Generate 4 random values for each curve
         self.ax.clear()
-
+        self.controls_layout.addWidget(self.x_length_label, 0, 0)
+        self.controls_layout.addWidget(self.curve_label, 3, 0)
+        self.controls_layout.addWidget(self.curve_label1, 5, 0)
+        self.controls_layout.addWidget(self.curve_label2, 6, 0)
+        self.controls_layout.addWidget(self.curve_label3, 7, 0)
+        self.controls_layout.addWidget(self.curve_label4, 8, 0)
+        self.controls_layout.addWidget(self.curve_label5, 9, 0)
+        self.controls_layout.addWidget(self.checkbox_1, 4, 0)
+        self.controls_layout.addWidget(self.button_1m, 1, 0)
+        self.controls_layout.addWidget(self.button_10m, 1, 1)
+        self.controls_layout.addWidget(self.button_30m, 2, 0)
+        self.controls_layout.addWidget(self.button_All, 2, 1)
         num_checked_boxes = sum(1 for checkbox in checked_boxes if checkbox.isChecked())
 
         for i, checkbox in enumerate(checked_boxes):
@@ -1243,7 +1294,9 @@ class RealTimePlot3(QMainWindow):
                 checkbox.setEnabled(True)
                 self.ax.plot(self.x_data, [data[i] for data in self.y_data], label=f'Curve {i+1}')
 
-        if max(self.x_data) - x_length < 0:
+        if x_length == -1:
+            self.ax.set_xlim(min(self.x_data), max(self.x_data))
+        elif max(self.x_data) - x_length < 0:
             self.ax.set_xlim(0, x_length)
         else:
             self.ax.set_xlim(max(self.x_data) - x_length, max(self.x_data))
