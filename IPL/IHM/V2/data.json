@@ -1,0 +1,59 @@
+{
+    "---": {
+        "test_time": "---",
+        "LOX_pressure": "---",
+        "ETH_pressure": "---",
+        "H2O_pressure": "---",
+        "TVC_pattern": "---",
+        "open_SV_interval": "---"
+    },
+    "Test profile 1": {
+        "test_time": "3",
+        "LOX_pressure": "16",
+        "ETH_pressure": "16",
+        "H2O_pressure": "4",
+        "TVC_pattern": "NONE",
+        "open_SV_interval": "0"
+    },
+    "Test profile 2": {
+        "test_time": "10",
+        "LOX_pressure": "16",
+        "ETH_pressure": "16",
+        "H2O_pressure": "4",
+        "TVC_pattern": "SQUARE",
+        "open_SV_interval": "+50"
+    },
+    "Test profile 3": {
+        "test_time": "1",
+        "LOX_pressure": "12",
+        "ETH_pressure": "12",
+        "H2O_pressure": "4",
+        "TVC_pattern": "NONE",
+        "open_SV_interval": "-50"
+    },
+    "Test profile 4": {
+        "test_time": "30",
+        "LOX_pressure": "12",
+        "ETH_pressure": "12",
+        "H2O_pressure": "4",
+        "TVC_pattern": "CIRCLE",
+        "open_SV_interval": "0"
+    }
+    ,
+    "Test profile 5": {
+        "test_time": "1",
+        "LOX_pressure": "12",
+        "ETH_pressure": "12",
+        "H2O_pressure": "4",
+        "TVC_pattern": "+",
+        "open_SV_interval": "-50"
+    },
+    "Test profile 6": {
+        "test_time": "30",
+        "LOX_pressure": "12",
+        "ETH_pressure": "12",
+        "H2O_pressure": "4",
+        "TVC_pattern": "-",
+        "open_SV_interval": "0"
+    }
+}

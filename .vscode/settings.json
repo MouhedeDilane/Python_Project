@@ -1,6 +1,10 @@
 {
     "C_Cpp.default.compilerPath": "C:\\msys64\\usr\\bin\\g++.exe",
     "files.associations": {
-        "cstddef": "cpp"
+        "cstddef": "cpp",
+        "stdlib.h": "c",
+        "time.h": "c",
+        "compare": "c",
+        "cstdint": "c"
     }
 }
